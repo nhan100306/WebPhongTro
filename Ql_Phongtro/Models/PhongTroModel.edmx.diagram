@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="111ae9c4f403443a863089ef5119cf42" Name="Diagram1">
+        <EntityTypeShape EntityType="QL_PhongTroCaMauModel.HinhAnhPhong" Width="1.5" PointX="8.25" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PhongTroCaMauModel.LichHen" Width="1.5" PointX="3" PointY="4.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PhongTroCaMauModel.NguoiDung" Width="1.5" PointX="0.75" PointY="4.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PhongTroCaMauModel.PhongTro" Width="1.5" PointX="6" PointY="3" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PhongTroCaMauModel.PhuongXa" Width="1.5" PointX="3.75" PointY="1.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PhongTroCaMauModel.TienIch" Width="1.5" PointX="8.25" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="QL_PhongTroCaMauModel.TuyenDuong" Width="1.5" PointX="3.75" PointY="8.25" IsExpanded="true" />
+        <AssociationConnector Association="QL_PhongTroCaMauModel.FK__HinhAnhPh__Phong__3C69FB99" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PhongTroCaMauModel.FK__LichHen__PhongID__46E78A0C" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PhongTroCaMauModel.FK__LichHen__SinhVie__45F365D3" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PhongTroCaMauModel.FK__PhongTro__ChuTro__37A5467C" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PhongTroCaMauModel.FK__PhongTro__Phuong__38996AB5" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PhongTroCaMauModel.FK__PhongTro__TuyenD__398D8EEE" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PhongTroCaMauModel.FK__TuyenDuon__Phuon__267ABA7A" ManuallyRouted="false" />
+        <AssociationConnector Association="QL_PhongTroCaMauModel.PhongTro_TienIch" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

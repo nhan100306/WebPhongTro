@@ -1,0 +1,129 @@
+﻿@model IEnumerable<Ql_Phongtro.Models.PhongTro>
+
+@{
+    ViewBag.Title = "Trang chủ - Tìm phòng trọ Cà Mau";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Vùng Hero Section / Chỗ sau này sẽ tích hợp thanh tìm kiếm đa luồng -->
+<div class="jumbotron text-center" style="background-image: linear-gradient(to right, #74ebd5, #9face6); color: #333; padding: 40px 0; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+    <h2 style="font-weight: bold; color: #2c3e50;">TÌM KIẾM PHÒNG TRỌ CÀ MAU</h2>
+    <p style="color: #2c3e50;">Nhanh chóng, an toàn và minh bạch</p>
+
+    <!-- Thanh Tìm kiếm và Lọc chia Grid ngang -->
+    <div class="container" style="background: white; padding: 20px 20px 10px 20px; border-radius: 8px; margin-top: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <form action="/Home/Index" method="get">
+            <div class="row">
+                <!-- Ô từ khóa -->
+                <div class="col-md-4" style="margin-bottom: 10px;">
+                    <input type="text" name="searchString" class="form-control" placeholder="Nhập tên đường, trường học (VD: Phân hiệu Cà Mau)...">
+                </div>
+                <!-- Lọc Giá -->
+                <div class="col-md-3" style="margin-bottom: 10px;">
+                    <select name="MucGia" class="form-control">
+                        <option value="">-- Mức giá --</option>
+                        <option value="duoi2">Dưới 2 triệu</option>
+                        <option value="2den3">Từ 2 - 3 triệu</option>
+                        <option value="3den5">Từ 3 - 5 triệu</option>
+                        <option value="tren5">Trên 5 triệu</option>
+                    </select>
+                </div>
+                <!-- Lọc Diện tích -->
+                <div class="col-md-3" style="margin-bottom: 10px;">
+                    <select name="DienTich" class="form-control">
+                        <option value="">-- Diện tích --</option>
+                        <option value="duoi20">Dưới 20m²</option>
+                        <option value="20den30">Từ 20m² - 30m²</option>
+                        <option value="tren30">Trên 30m²</option>
+                    </select>
+                </div>
+                <!-- Nút bấm -->
+                <div class="col-md-2" style="margin-bottom: 10px;">
+                    <button type="submit" class="btn btn-primary btn-block"><i class="glyphicon glyphicon-search"></i> Tìm kiếm</button>
+                </div>
+            </div>
+            <!-- BỔ SUNG: Khung chứa Checkbox Tiện ích -->
+            <div class="row" style="margin-top: 15px; border-top: 1px dashed #ddd; padding-top: 15px;">
+                <div class="col-md-12">
+                    <p style="font-weight: bold; color: #5f6368; font-size: 13px; margin-bottom: 10px;">Lọc thêm theo tiện ích:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+
+                        <!-- Vòng lặp tự động render các tiện ích từ Database -->
+                        @if (ViewBag.ListTienIch != null)
+                        {
+                            foreach (var ti in ViewBag.ListTienIch)
+                            {
+                                <label style="font-weight: normal; cursor: pointer; color: #333; display: flex; align-items: center;">
+                                    <!-- Tham số name="selectedTienIch" trùng với tham số hàm trong Controller -->
+                                    <input type="checkbox" name="selectedTienIch" value="@ti.TienIchID" style="margin-right: 5px; margin-top: 0;">
+                                    @ti.TenTienIch
+                                </label>
+                            }
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container">
+    <h3 class="page-header" style="border-bottom: 2px solid #337ab7; padding-bottom: 10px; margin-bottom: 20px;">
+        PHÒNG TRỌ MỚI CẬP NHẬT
+    </h3>
+
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                // Lấy ảnh đầu tiên của phòng trọ làm ảnh đại diện
+                var anhDaiDien = item.HinhAnhPhong.FirstOrDefault();
+                string urlAnh = anhDaiDien != null ? anhDaiDien.UrlHinhAnh : "https://via.placeholder.com/300x200?text=Chưa+có+ảnh";
+
+                <div class="col-md-4 col-sm-6" style="margin-bottom: 25px;">
+                    <!-- Thẻ (Card) hiển thị phòng trọ -->
+                    <div class="thumbnail" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; border: none;">
+
+                        <!-- Hình ảnh -->
+                        <img src="@urlAnh" alt="Ảnh phòng trọ" style="height: 220px; width: 100%; object-fit: cover;" />
+
+                        <!-- Nội dung -->
+                        <div class="caption" style="padding: 15px;">
+                            <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0;" title="@item.TieuDe">
+                                <strong style="color: #333;">@item.TieuDe</strong>
+                            </h4>
+
+                            <!-- Giá tiền nổi bật -->
+                            <h4 class="text-danger" style="font-weight: bold; margin-bottom: 15px;">
+                                @String.Format("{0:0,0}", item.GiaThue) VNĐ/tháng
+                            </h4>
+
+                            <!-- Các thông số cơ bản -->
+                            <p style="color: #666; margin-bottom: 5px;">
+                                <i class="glyphicon glyphicon-home" style="margin-right: 5px;"></i> Diện tích: <strong>@item.DienTich m²</strong>
+                            </p>
+                            <p style="color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="glyphicon glyphicon-map-marker" style="margin-right: 5px;"></i> Khu vực: @(item.PhuongXa != null ? item.PhuongXa.TenPhuongXa : "Đang cập nhật")
+                            </p>
+
+                            <hr style="margin: 15px 0;" />
+
+                            <!-- Nút chức năng -->
+                            <a href="/Home/Details/@item.PhongID" class="btn btn-primary btn-block" style="border-radius: 20px;">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-md-12 text-center">
+                <div class="alert alert-warning">
+                    Hiện tại chưa có phòng trọ nào còn trống hoặc đã được kiểm duyệt.
+                </div>
+            </div>
+        }
+    </div>
+</div>

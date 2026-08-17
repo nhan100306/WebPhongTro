@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Trọ Cà Mau</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style>
+        /* Thiết lập nền và đẩy nội dung xuống dưới menu */
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding-top: 80px;
+        }
+
+        /* Code Thanh Menu tự thiết kế (Bất chấp lỗi Bootstrap) */
+        .my-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 65px;
+            background-color: #1a4b82;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+            .my-navbar a {
+                color: white;
+                text-decoration: none;
+                font-size: 15px;
+                margin: 0 15px;
+                font-weight: 500;
+                transition: 0.3s;
+            }
+
+                .my-navbar a:hover {
+                    color: #f1c40f;
+                }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Tùy chỉnh nút */
+        .btn-register {
+            background-color: #f39c12;
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: #fff !important;
+            font-weight: bold;
+        }
+
+            .btn-register:hover {
+                background-color: #e67e22;
+            }
+
+        /* Box User khi đăng nhập */
+        .user-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-logout {
+            background-color: #e74c3c;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin: 0 !important;
+        }
+
+            .btn-logout:hover {
+                background-color: #c0392b;
+                color: white !important;
+            }
+
+        .footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 25px 0;
+            margin-top: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- THANH ĐIỀU HƯỚNG MỚI -->
+    <div class="my-navbar">
+        <div class="nav-left">
+            <a href="/Home/Index" style="font-size: 20px; font-weight: bold; margin-right: 40px; letter-spacing: 1px;">
+                <i class="glyphicon glyphicon-home"></i> TRỌ CÀ MAU
+            </a>
+            <a href="/Home/Index">Trang chủ</a>
+            <a href="#">Danh sách phòng</a>
+        </div>
+
+        <div class="nav-right">
+            @if (Session["UserID"] != null)
+            {
+                <!-- NẾU ĐÃ ĐĂNG NHẬP SẼ HIỆN KHỐI NÀY -->
+                <div class="user-box">
+                    <span>Xin chào, <strong>@Session["HoTen"]</strong></span>
+
+                    <!-- Chuyển hướng theo chức vụ -->
+                    @if (Session["VaiTro"] != null && Session["VaiTro"].ToString() == "Admin")
+                    {
+                        <a href="/Admin/Index" style="color: #f1c40f;"><i class="glyphicon glyphicon-dashboard"></i> Quản trị</a>
+                    }
+                    else if (Session["VaiTro"] != null && Session["VaiTro"].ToString() == "ChuTro")
+                    {
+                        <a href="/ChuTro/Index" style="color: #f1c40f;"><i class="glyphicon glyphicon-list-alt"></i> Quản lý phòng</a>
+                    }
+
+                    <a href="/Account/Logout" class="btn-logout"><i class="glyphicon glyphicon-log-out"></i> Thoát</a>
+                </div>
+            }
+            else
+            {
+                <!-- NẾU CHƯA ĐĂNG NHẬP SẼ HIỆN KHỐI NÀY -->
+                <a href="/Account/Login">Đăng nhập</a>
+                <a href="/Account/Register" class="btn-register">Đăng ký ngay</a>
+            }
+        </div>
+    </div>
+
+    <!-- Kéo nội dung các trang con vào đây -->
+    <div class="container body-content">
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; @DateTime.Now.Year - Website giới thiệu & tìm kiếm phòng trọ</p>
+        <p>Phát triển bởi Nhóm 3: Turtles</p>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

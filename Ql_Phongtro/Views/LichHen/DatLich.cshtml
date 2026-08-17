@@ -1,0 +1,46 @@
+﻿@model Ql_Phongtro.Models.PhongTro
+
+@{
+    ViewBag.Title = "Đặt lịch xem phòng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row" style="margin-top: 30px;">
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title text-center" style="font-weight: bold;">ĐẶT LỊCH HẸN XEM PHÒNG</h3>
+            </div>
+            <div class="panel-body">
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+                <div class="well well-sm">
+                    <strong>Phòng:</strong> @Model.TieuDe <br />
+                    <strong>Địa chỉ:</strong> @Model.DiaChiChiTiet
+                </div>
+
+                <form action="/LichHen/DatLich" method="post">
+                    <!-- Gửi ngầm ID phòng về server -->
+                    <input type="hidden" name="PhongID" value="@Model.PhongID" />
+
+                    <div class="form-group">
+                        <label>Chọn ngày giờ hẹn đến xem:</label>
+                        <!-- type="datetime-local" hiển thị bộ chọn ngày giờ trên lịch -->
+                        <input type="datetime-local" name="ThoiGianHen" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Lời nhắn cho Chủ trọ (Không bắt buộc):</label>
+                        <textarea name="GhiChu" class="form-control" rows="3" placeholder="Ví dụ: Mình đi 2 người, muốn xem lúc chiều..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-block"><i class="glyphicon glyphicon-send"></i> Xác nhận đặt lịch</button>
+                    <a href="/Home/Details/@Model.PhongID" class="btn btn-default btn-block">Hủy</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

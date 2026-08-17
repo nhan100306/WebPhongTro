@@ -1,0 +1,109 @@
+﻿@model Ql_Phongtro.Models.PhongTro
+
+@{
+    ViewBag.Title = Model.TieuDe;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="margin-top: 20px;">
+    <!-- Tiêu đề và Địa chỉ -->
+    <div class="row">
+        <div class="col-md-12">
+            <h2 style="color: #2c3e50; font-weight: bold;">@Model.TieuDe</h2>
+            <p style="font-size: 16px; color: #7f8c8d;">
+                <i class="glyphicon glyphicon-map-marker"></i> @Model.DiaChiChiTiet, @(Model.PhuongXa != null ? Model.PhuongXa.TenPhuongXa : "")
+            </p>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Cột Trái: Hình ảnh và Chi tiết không gian -->
+        <div class="col-md-8">
+            <!-- Khu vực Hiển thị Hình ảnh -->
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @if (Model.HinhAnhPhong != null && Model.HinhAnhPhong.Any())
+                    {
+                        var anhChinh = Model.HinhAnhPhong.First().UrlHinhAnh;
+                        <img src="@anhChinh" style="width: 100%; height: 400px; object-fit: cover; border-radius: 5px;" alt="Ảnh chính" />
+
+                        <!-- Hiển thị các ảnh nhỏ bên dưới -->
+                        <div style="margin-top: 10px; display: flex; gap: 10px; overflow-x: auto;">
+                            @foreach (var anh in Model.HinhAnhPhong.Skip(1))
+                            {
+                                <img src="@anh.UrlHinhAnh" style="width: 100px; height: 75px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" alt="Ảnh phụ" />
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <img src="https://via.placeholder.com/800x400?text=Chưa+có+hình+ảnh" style="width: 100%; height: 400px; object-fit: cover; border-radius: 5px;" />
+                    }
+                </div>
+            </div>
+
+            <!-- Khu vực Tiện ích -->
+            <div class="panel panel-info">
+                <div class="panel-heading"><h4 class="panel-title">Tiện ích đi kèm</h4></div>
+                <div class="panel-body">
+                    <div class="row">
+                        @if (Model.TienIch != null && Model.TienIch.Any())
+                        {
+                            foreach (var tienIch in Model.TienIch)
+                            {
+                                <div class="col-sm-4" style="margin-bottom: 10px;">
+                                    <i class="glyphicon glyphicon-ok text-success"></i> @tienIch.TenTienIch
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-sm-12 text-muted">Chưa cập nhật tiện ích.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột Phải: Giá cả và Thông tin liên hệ -->
+        <div class="col-md-4">
+            <!-- Box Giá và Đặt lịch -->
+            <div class="panel panel-success">
+                <div class="panel-body text-center">
+                    <h3 class="text-danger" style="font-weight: bold; margin-top: 0;">
+                        @String.Format("{0:0,0}", Model.GiaThue) đ/tháng
+                    </h3>
+                    <p style="font-size: 16px;">Diện tích: <strong>@Model.DienTich m²</strong></p>
+                    <p style="font-size: 16px;">Loại hình: <strong>@Model.LoaiHinh</strong></p>
+                    <p style="font-size: 16px;">Sức chứa: <strong>@Model.SucChua người</strong></p>
+
+                    <hr />
+                    <!-- Nút Đặt Lịch Hẹn -->
+                    <a href="/LichHen/DatLich/@Model.PhongID" class="btn btn-success btn-lg btn-block" style="border-radius: 30px;">
+                        <i class="glyphicon glyphicon-calendar"></i> Đặt Lịch Xem Phòng
+                    </a>
+                </div>
+            </div>
+
+            <!-- Box Thông tin Chủ trọ -->
+            <div class="panel panel-warning">
+                <div class="panel-heading"><h4 class="panel-title">Thông tin Liên hệ</h4></div>
+                <div class="panel-body">
+                    <p><strong>Chủ trọ:</strong> @(Model.NguoiDung != null ? Model.NguoiDung.HoTen : "Đang cập nhật")</p>
+                    <p>
+                        <strong>Số điện thoại:</strong>
+                        <a href="tel:@(Model.NguoiDung != null ? Model.NguoiDung.SoDienThoai : "")" style="font-size: 18px; font-weight: bold; color: #d35400;">
+                            @(Model.NguoiDung != null ? Model.NguoiDung.SoDienThoai : "---")
+                        </a>
+                    </p>
+                    <p><strong>Thời gian liên hệ:</strong> @Model.ThoiGianLienHe</p>
+
+                    <hr style="margin: 10px 0;" />
+                    <p><strong>Điện:</strong> @String.Format("{0:0,0}", Model.TienDien) đ/kWh</p>
+                    <p><strong>Nước:</strong> @String.Format("{0:0,0}", Model.TienNuoc) đ/khối</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+﻿@{
+    ViewBag.Title = "Đăng nhập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Vùng bọc ngoài sử dụng Flexbox để canh giữa tuyệt đối cả dọc và ngang -->
+<div style="display: flex; justify-content: center; align-items: center; min-height: 80vh; background-color: #f4f7f6;">
+
+    <!-- Khối Box Đăng nhập -->
+    <div style="width: 100%; max-width: 420px; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 40px;">
+
+        <!-- Phần Logo / Tiêu đề -->
+        <div class="text-center" style="margin-bottom: 30px;">
+            <div style="width: 70px; height: 70px; background-color: #e8f0fe; border-radius: 50%; display: inline-block; line-height: 70px; margin-bottom: 15px;">
+                <i class="glyphicon glyphicon-user" style="font-size: 30px; color: #1a73e8;"></i>
+            </div>
+            <h3 style="font-weight: bold; color: #202124; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">ĐĂNG NHẬP</h3>
+            <p style="color: #5f6368; font-size: 13px; margin-top: 5px;">Hệ thống tìm kiếm phòng trọ Cà Mau</p>
+        </div>
+
+        <!-- Khung báo lỗi từ Controller -->
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger" style="font-size: 13px; padding: 10px; border-radius: 5px;">
+                <i class="glyphicon glyphicon-exclamation-sign"></i> @ViewBag.Error
+            </div>
+        }
+
+        <!-- Form nhập liệu Gửi về Controller -->
+        <form action="/Account/Login" method="post">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="font-size: 11px; font-weight: bold; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px;">Số điện thoại</label>
+                <!-- Bắt buộc giữ nguyên name="SoDienThoai" -->
+                <input type="text" name="SoDienThoai" class="form-control" placeholder="Ví dụ: 0901234567..." required autofocus style="height: 45px; border-radius: 4px; border: 1px solid #dadce0;" />
+            </div>
+
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label style="font-size: 11px; font-weight: bold; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px;">Mật khẩu</label>
+                <!-- Bắt buộc giữ nguyên name="MatKhau" -->
+                <input type="password" name="MatKhau" class="form-control" placeholder="Nhập mật khẩu của bạn..." required style="height: 45px; border-radius: 4px; border: 1px solid #dadce0;" />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="background-color: #1a4b82; border: none; height: 45px; font-weight: 600; font-size: 14px; border-radius: 4px; transition: 0.3s;">ĐĂNG NHẬP NGAY</button>
+        </form>
+
+        <!-- Nút Đăng ký -->
+        <div class="text-center" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f1f3f4; font-size: 13px;">
+            <span style="color: #5f6368;">Bạn chưa có tài khoản?</span>
+            <a href="/Account/Register" style="color: #1a4b82; font-weight: 600; text-decoration: none;">Đăng ký tài khoản</a>
+        </div>
+    </div>
+</div>

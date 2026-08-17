@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Căn giữa form tương tự trang Login -->
+<div style="display: flex; justify-content: center; align-items: center; min-height: 85vh; background-color: #f4f7f6; padding: 40px 0;">
+
+    <div style="width: 100%; max-width: 450px; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 40px;">
+
+        <!-- Tiêu đề -->
+        <div class="text-center" style="margin-bottom: 30px;">
+            <div style="width: 70px; height: 70px; background-color: #fce4ec; border-radius: 50%; display: inline-block; line-height: 70px; margin-bottom: 15px;">
+                <i class="glyphicon glyphicon-pencil" style="font-size: 30px; color: #d81b60;"></i>
+            </div>
+            <h3 style="font-weight: bold; color: #202124; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">ĐĂNG KÝ TÀI KHOẢN</h3>
+            <p style="color: #5f6368; font-size: 13px; margin-top: 5px;">Tham gia hệ thống Trọ Cà Mau</p>
+        </div>
+
+        <!-- Báo lỗi -->
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger" style="font-size: 13px; padding: 10px; border-radius: 5px;">
+                <i class="glyphicon glyphicon-exclamation-sign"></i> @ViewBag.Error
+            </div>
+        }
+
+        <!-- Form Đăng ký -->
+    <form action="/Account/Register" method="post">
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="font-size: 11px; font-weight: bold; color: #5f6368; text-transform: uppercase;">Họ và tên của bạn</label>
+            <input type="text" name="HoTen" class="form-control" placeholder="Ví dụ: Nguyễn Thanh Nhàn..." required autofocus style="height: 45px; border-radius: 4px; border: 1px solid #dadce0;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="font-size: 11px; font-weight: bold; color: #5f6368; text-transform: uppercase;">Số điện thoại (Dùng để đăng nhập)</label>
+            <input type="text" name="SoDienThoai" class="form-control" placeholder="Nhập số điện thoại..." required style="height: 45px; border-radius: 4px; border: 1px solid #dadce0;" />
+        </div>
+
+        <!-- Thêm ô nhập Zalo_Email (ngay dưới ô Số điện thoại) -->
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="font-size: 11px; font-weight: bold; color: #5f6368; text-transform: uppercase;">Zalo / Email (Liên hệ phụ)</label>
+            <!-- Bắt buộc giữ name="Zalo_Email" để khớp với Controller -->
+            <input type="text" name="Zalo_Email" class="form-control" placeholder="Ví dụ: nhanit@gmail.com hoặc Zalo: 090..." style="height: 45px; border-radius: 4px; border: 1px solid #dadce0;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="font-size: 11px; font-weight: bold; color: #5f6368; text-transform: uppercase;">Mật khẩu</label>
+            <input type="password" name="MatKhau" class="form-control" placeholder="Tạo mật khẩu..." required style="height: 45px; border-radius: 4px; border: 1px solid #dadce0;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label style="font-size: 11px; font-weight: bold; color: #5f6368; text-transform: uppercase;">Xác nhận Mật khẩu</label>
+            <input type="password" name="XacNhanMatKhau" class="form-control" placeholder="Nhập lại mật khẩu..." required style="height: 45px; border-radius: 4px; border: 1px solid #dadce0;" />
+        </div>
+
+        <div class="form-group" style="margin-bottom: 25px;">
+            <label style="font-size: 11px; font-weight: bold; color: #5f6368; text-transform: uppercase;">Vai trò của bạn</label>
+            <select name="VaiTro" class="form-control" style="height: 45px; border-radius: 4px; border: 1px solid #dadce0;">
+                <option value="SinhVien">Tôi là Sinh Viên (Đi tìm phòng)</option>
+                <option value="ChuTro">Tôi là Chủ Nhà Trọ (Người cho thuê)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="background-color: #d81b60; border: none; height: 45px; font-weight: 600; font-size: 14px; border-radius: 4px; transition: 0.3s;">TẠO TÀI KHOẢN</button>
+    </form>
+
+        <!-- Quay lại Đăng nhập -->
+        <div class="text-center" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f1f3f4; font-size: 13px;">
+            <span style="color: #5f6368;">Đã có tài khoản?</span>
+            <a href="/Account/Login" style="color: #d81b60; font-weight: 600; text-decoration: none;">Đăng nhập ngay</a>
+        </div>
+    </div>
+</div>
