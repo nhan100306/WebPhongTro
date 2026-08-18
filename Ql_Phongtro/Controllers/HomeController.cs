@@ -63,5 +63,28 @@ namespace Ql_Phongtro.Controllers
 
             return View(phongTro);
         }
+ 
+
+        public ActionResult DatLichHen(int PhongID, DateTime ThoiGianHen, string GhiChu)
+        {
+            // SinhVienID mặc định theo tài khoản demo
+            int maSinhVien = 1;
+
+            var lichHen = new LichHen
+            {
+                SinhVienID = maSinhVien,
+                PhongID = PhongID,
+                ThoiGianHen = ThoiGianHen,
+                GhiChu = GhiChu,
+                TrangThai = "Chờ xác nhận",
+                NgayTao = DateTime.Now
+            };
+
+            db.LichHen.Add(lichHen);
+            db.SaveChanges();
+
+            TempData["LichHenSuccess"] = "Gửi yêu cầu đặt lịch hẹn thành công! Chủ trọ sẽ sớm xem và phản hồi bạn.";
+            return RedirectToAction("Details", new { id = PhongID });
+        }
     }
 }
