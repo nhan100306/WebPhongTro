@@ -3,106 +3,168 @@
 @{
     ViewBag.Title = Model.TieuDe;
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var danhSachAnh = Model.HinhAnhPhong != null ? Model.HinhAnhPhong.ToList() : new List<Ql_Phongtro.Models.HinhAnhPhong>();
+    var anhBia = danhSachAnh.FirstOrDefault() != null ? danhSachAnh.FirstOrDefault().UrlHinhAnh : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800";
 }
 
-<div class="container" style="margin-top: 20px;">
-    <!-- Tiêu đề và Địa chỉ -->
-    <div class="row">
-        <div class="col-md-12">
-            <h2 style="color: #2c3e50; font-weight: bold;">@Model.TieuDe</h2>
-            <p style="font-size: 16px; color: #7f8c8d;">
-                <i class="glyphicon glyphicon-map-marker"></i> @Model.DiaChiChiTiet, @(Model.PhuongXa != null ? Model.PhuongXa.TenPhuongXa : "")
-            </p>
-            <hr />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="container" style="max-width: 1140px; margin: 30px auto 50px auto; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+    <!-- Thông báo sau khi đặt lịch -->
+    @if (TempData["LichHenSuccess"] != null)
+    {
+        <div style="background-color: #e0f2fe; border: 1px solid #bae6fd; color: #0369a1; padding: 14px 20px; border-radius: 12px; margin-bottom: 25px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+            <i class="fa-solid fa-circle-check" style="font-size: 18px; color: #0284c7;"></i>
+            <span>@TempData["LichHenSuccess"]</span>
         </div>
+    }
+
+    <!-- Tiêu đề & Tag loại hình -->
+    <div style="background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);">
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <span style="background: #e0f2fe; color: #0369a1; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px;">@Model.LoaiHinh</span>
+            <span style="background: #fef3c7; color: #92400e; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px;">@Model.TrangThaiPhong</span>
+        </div>
+        <h1 style="color: #1e293b; font-size: 26px; font-weight: 800; margin: 0 0 10px 0;">@Model.TieuDe</h1>
+        <p style="color: #64748b; font-size: 14px; margin: 0; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-location-dot" style="color: #ef4444;"></i>
+            @(Model.DiaChiChiTiet != null ? Model.DiaChiChiTiet + ", " : "") @(Model.TuyenDuong != null ? Model.TuyenDuong.TenDuong : ""), @(Model.PhuongXa != null ? Model.PhuongXa.TenPhuongXa : ""), TP. Cà Mau
+        </p>
     </div>
 
-    <div class="row">
-        <!-- Cột Trái: Hình ảnh và Chi tiết không gian -->
-        <div class="col-md-8">
-            <!-- Khu vực Hiển thị Hình ảnh -->
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    @if (Model.HinhAnhPhong != null && Model.HinhAnhPhong.Any())
+    <!-- Khung Hình ảnh -->
+    <div style="background: #ffffff; padding: 16px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);">
+        <div class="row">
+            <div class="col-md-8" style="margin-bottom: 10px;">
+                <img src="@anhBia" alt="Ảnh phòng" style="width: 100%; height: 380px; object-fit: cover; border-radius: 12px;" />
+            </div>
+            <div class="col-md-4">
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    @if (danhSachAnh.Count > 1)
                     {
-                        var anhChinh = Model.HinhAnhPhong.First().UrlHinhAnh;
-                        <img src="@anhChinh" style="width: 100%; height: 400px; object-fit: cover; border-radius: 5px;" alt="Ảnh chính" />
-
-                        <!-- Hiển thị các ảnh nhỏ bên dưới -->
-                        <div style="margin-top: 10px; display: flex; gap: 10px; overflow-x: auto;">
-                            @foreach (var anh in Model.HinhAnhPhong.Skip(1))
-                            {
-                                <img src="@anh.UrlHinhAnh" style="width: 100px; height: 75px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;" alt="Ảnh phụ" />
-                            }
-                        </div>
+                        foreach (var img in danhSachAnh.Skip(1).Take(2))
+                        {
+                            <img src="@img.UrlHinhAnh" alt="Ảnh chi tiết" style="width: 100%; height: 185px; object-fit: cover; border-radius: 12px; border: 1px solid #f1f5f9;" />
+                        }
                     }
                     else
                     {
-                        <img src="https://via.placeholder.com/800x400?text=Chưa+có+hình+ảnh" style="width: 100%; height: 400px; object-fit: cover; border-radius: 5px;" />
+                        <img src="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=500" alt="Ảnh mô tả" style="width: 100%; height: 185px; object-fit: cover; border-radius: 12px;" />
                     }
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Khu vực Tiện ích -->
-            <div class="panel panel-info">
-                <div class="panel-heading"><h4 class="panel-title">Tiện ích đi kèm</h4></div>
-                <div class="panel-body">
-                    <div class="row">
-                        @if (Model.TienIch != null && Model.TienIch.Any())
-                        {
-                            foreach (var tienIch in Model.TienIch)
-                            {
-                                <div class="col-sm-4" style="margin-bottom: 10px;">
-                                    <i class="glyphicon glyphicon-ok text-success"></i> @tienIch.TenTienIch
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            <div class="col-sm-12 text-muted">Chưa cập nhật tiện ích.</div>
-                        }
+    <!-- Thông tin chi tiết & Cột Đặt lịch -->
+    <div class="row">
+        <!-- Cột trái: Thông số & Tiện ích -->
+        <div class="col-md-8">
+            <div style="background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);">
+                <h3 style="color: #1e293b; font-size: 18px; font-weight: 700; margin-top: 0; padding-bottom: 12px; border-bottom: 2px solid #2563eb;">
+                    Thông số & Chi phí thuê
+                </h3>
+                <div class="row" style="margin-top: 15px;">
+                    <div class="col-xs-6 col-sm-3" style="margin-bottom: 15px;">
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #f1f5f9; text-align: center;">
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600;">Giá thuê</span>
+                            <div style="font-size: 18px; font-weight: 800; color: #dc2626; margin-top: 4px;">@string.Format("{0:N0}", Model.GiaThue) đ</div>
+                        </div>
                     </div>
+                    <div class="col-xs-6 col-sm-3" style="margin-bottom: 15px;">
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #f1f5f9; text-align: center;">
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600;">Tiền cọc</span>
+                            <div style="font-size: 16px; font-weight: 700; color: #1e293b; margin-top: 4px;">@(Model.TienCoc.HasValue ? string.Format("{0:N0} đ", Model.TienCoc) : "0 đ")</div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3" style="margin-bottom: 15px;">
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #f1f5f9; text-align: center;">
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600;">Diện tích</span>
+                            <div style="font-size: 16px; font-weight: 700; color: #1e293b; margin-top: 4px;">@Model.DienTich m²</div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-3" style="margin-bottom: 15px;">
+                        <div style="background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #f1f5f9; text-align: center;">
+                            <span style="font-size: 12px; color: #64748b; font-weight: 600;">Sức chứa</span>
+                            <div style="font-size: 16px; font-weight: 700; color: #1e293b; margin-top: 4px;">@Model.SucChua người</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; background: #eff6ff; padding: 14px 18px; border-radius: 12px; border: 1px solid #dbeafe; display: flex; flex-wrap: wrap; gap: 20px; font-size: 13px; color: #1e40af;">
+                    <div><i class="fa-solid fa-bolt" style="color: #f59e0b; margin-right: 6px;"></i> Điện: <strong>@(Model.TienDien.HasValue ? string.Format("{0:N0} đ/kWh", Model.TienDien) : "Giá nhà nước")</strong></div>
+                    <div><i class="fa-solid fa-droplet" style="color: #0284c7; margin-right: 6px;"></i> Nước: <strong>@(Model.TienNuoc.HasValue ? string.Format("{0:N0} đ/tháng", Model.TienNuoc) : "Giá nhà nước")</strong></div>
+                    <div><i class="fa-solid fa-wifi" style="color: #2563eb; margin-right: 6px;"></i> Wifi/Dịch vụ: <strong>@(Model.PhiDichVu.HasValue ? string.Format("{0:N0} đ", Model.PhiDichVu) : "Miễn phí")</strong></div>
+                </div>
+            </div>
+
+            <!-- Tiện ích đi kèm -->
+            <div style="background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);">
+                <h3 style="color: #1e293b; font-size: 18px; font-weight: 700; margin-top: 0; padding-bottom: 12px; border-bottom: 2px solid #2563eb;">
+                    Tiện ích sẵn có
+                </h3>
+                <div class="row" style="margin-top: 15px;">
+                    @if (Model.TienIch != null && Model.TienIch.Any())
+                    {
+                        foreach (var ti in Model.TienIch)
+                        {
+                            <div class="col-xs-6 col-sm-4" style="margin-bottom: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #334155;">
+                                    <i class="fa-solid fa-circle-check" style="color: #2563eb;"></i>
+                                    <span>@ti.TenTienIch</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="col-xs-12" style="color: #94a3b8;">Chưa cập nhật tiện ích.</div>
+                    }
                 </div>
             </div>
         </div>
 
-        <!-- Cột Phải: Giá cả và Thông tin liên hệ -->
+        <!-- Cột phải: Chủ trọ & Đặt lịch hẹn -->
         <div class="col-md-4">
-            <!-- Box Giá và Đặt lịch -->
-            <div class="panel panel-success">
-                <div class="panel-body text-center">
-                    <h3 class="text-danger" style="font-weight: bold; margin-top: 0;">
-                        @String.Format("{0:0,0}", Model.GiaThue) đ/tháng
-                    </h3>
-                    <p style="font-size: 16px;">Diện tích: <strong>@Model.DienTich m²</strong></p>
-                    <p style="font-size: 16px;">Loại hình: <strong>@Model.LoaiHinh</strong></p>
-                    <p style="font-size: 16px;">Sức chứa: <strong>@Model.SucChua người</strong></p>
-
-                    <hr />
-                    <!-- Nút Đặt Lịch Hẹn -->
-                    <a href="/LichHen/DatLich/@Model.PhongID" class="btn btn-success btn-lg btn-block" style="border-radius: 30px;">
-                        <i class="glyphicon glyphicon-calendar"></i> Đặt Lịch Xem Phòng
-                    </a>
+            <!-- Thẻ Chủ trọ -->
+            <div style="background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 24px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: #204a7a; color: #ffffff; font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
+                    @(Model.NguoiDung != null ? Model.NguoiDung.HoTen.Substring(0, 1) : "C")
                 </div>
+                <h4 style="color: #1e293b; font-size: 18px; font-weight: 700; margin: 0 0 4px 0;">@(Model.NguoiDung != null ? Model.NguoiDung.HoTen : "Chủ Nhà Trọ")</h4>
+                <p style="color: #64748b; font-size: 13px; margin-bottom: 16px;">Thời gian liên hệ: @(Model.ThoiGianLienHe ?? "Cả ngày")</p>
+
+                <a href="tel:@(Model.NguoiDung != null ? Model.NguoiDung.SoDienThoai : "")" style="display: block; width: 100%; background: #f59e0b; color: #ffffff; font-weight: 700; padding: 12px; border-radius: 10px; text-decoration: none; font-size: 15px; box-shadow: 0 2px 4px rgba(245,158,11,0.3);">
+                    <i class="fa-solid fa-phone" style="margin-right: 6px;"></i> @(Model.NguoiDung != null ? Model.NguoiDung.SoDienThoai : "0912345678")
+                </a>
             </div>
 
-            <!-- Box Thông tin Chủ trọ -->
-            <div class="panel panel-warning">
-                <div class="panel-heading"><h4 class="panel-title">Thông tin Liên hệ</h4></div>
-                <div class="panel-body">
-                    <p><strong>Chủ trọ:</strong> @(Model.NguoiDung != null ? Model.NguoiDung.HoTen : "Đang cập nhật")</p>
-                    <p>
-                        <strong>Số điện thoại:</strong>
-                        <a href="tel:@(Model.NguoiDung != null ? Model.NguoiDung.SoDienThoai : "")" style="font-size: 18px; font-weight: bold; color: #d35400;">
-                            @(Model.NguoiDung != null ? Model.NguoiDung.SoDienThoai : "---")
-                        </a>
-                    </p>
-                    <p><strong>Thời gian liên hệ:</strong> @Model.ThoiGianLienHe</p>
+            <!-- Form Đặt Lịch Hẹn -->
+            <div style="background: #ffffff; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);">
+                <h4 style="color: #1e293b; font-size: 17px; font-weight: 700; margin-top: 0; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-regular fa-calendar-check" style="color: #2563eb;"></i> Đặt lịch hẹn xem phòng
+                </h4>
 
-                    <hr style="margin: 10px 0;" />
-                    <p><strong>Điện:</strong> @String.Format("{0:0,0}", Model.TienDien) đ/kWh</p>
-                    <p><strong>Nước:</strong> @String.Format("{0:0,0}", Model.TienNuoc) đ/khối</p>
-                </div>
+                @using (Html.BeginForm("DatLichHen", "Home", FormMethod.Post, new { style = "display: flex; flex-direction: column; gap: 14px;" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="PhongID" value="@Model.PhongID" />
+
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Thời gian muốn xem *</label>
+                        <input type="datetime-local" name="ThoiGianHen" required style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;" />
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 6px;">Ghi chú gửi chủ trọ</label>
+                        <textarea name="GhiChu" rows="3" placeholder="VD: Em là sinh viên muốn qua xem phòng..." style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px;"></textarea>
+                    </div>
+
+                    <button type="submit" style="width: 100%; background: #2563eb; color: #ffffff; font-weight: 700; padding: 12px; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.3);">
+                        <i class="fa-solid fa-paper-plane" style="margin-right: 6px;"></i> Gửi yêu cầu đặt lịch
+                    </button>
+                }
             </div>
         </div>
     </div>

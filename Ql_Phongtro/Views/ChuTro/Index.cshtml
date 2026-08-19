@@ -1,0 +1,285 @@
+﻿@model IEnumerable<Ql_Phongtro.Models.PhongTro>
+@{
+    ViewBag.Title = "Kênh Quản Lý Chủ Trọ - Cà Mau";
+    Layout = null;
+    var danhSachLichHen = ViewBag.LichHen as List<Ql_Phongtro.Models.LichHen>;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kênh Quản Lý Chủ Trọ - Đặng Công Danh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: { 800: '#204a7a', 900: '#1b3b61' },
+                        amberbtn: '#f59e0b',
+                        royal: '#2563eb'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col font-sans">
+
+    <!-- Header Navy Đồng Bộ -->
+    <header class="bg-navy-800 text-white sticky top-0 z-30 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-xl font-bold tracking-wider">TRỌ CÀ MAU</span>
+                <span class="hidden sm:inline-block text-xs bg-white/20 text-white font-semibold px-2.5 py-0.5 rounded-full ml-2">Kênh Chủ Nhà Trọ</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-full bg-amber-500 text-white font-bold flex items-center justify-center shadow">D</div>
+                <div class="text-left text-xs">
+                    <p class="font-bold text-white leading-tight">Đặng Công Danh</p>
+                    <p class="text-slate-300">Chủ nhà trọ (0912345678)</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl w-full mx-auto px-4 py-8 space-y-6 flex-1">
+
+        <!-- Flash Alert -->
+        @if (TempData["SuccessMsg"] != null)
+        {
+            <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl text-sm font-semibold flex items-center">
+                <i class="fa-solid fa-circle-check text-blue-600 mr-2 text-base"></i> @TempData["SuccessMsg"]
+            </div>
+        }
+
+        <!-- Gradient Banner Header -->
+        <div class="rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-slate-800" style="background-image: linear-gradient(to right, #74ebd5, #9face6);">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">Bảng điều khiển quản lý phòng trọ</h1>
+                <p class="text-sm text-slate-700 mt-1">Đăng tin phòng trọ mới và tiếp nhận lịch hẹn từ sinh viên ĐH Bình Dương - Cà Mau</p>
+            </div>
+            <button onclick="document.getElementById('modalDangTin').classList.remove('hidden')" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl shadow transition">
+                <i class="fa-solid fa-plus mr-1.5"></i> Đăng tin mới
+            </button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Tổng phòng quản lý</p>
+                    <h3 class="text-2xl font-extrabold text-slate-800 mt-1">@Model.Count()</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-blue-50 text-royal flex items-center justify-center text-xl"><i class="fa-solid fa-door-open"></i></div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Phòng còn trống</p>
+                    <h3 class="text-2xl font-extrabold text-emerald-600 mt-1">@Model.Count(x => x.TrangThaiPhong == "Còn trống")</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl"><i class="fa-solid fa-bed"></i></div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Lịch hẹn chờ duyệt</p>
+                    <h3 class="text-2xl font-extrabold text-amber-500 mt-1">@(danhSachLichHen != null ? danhSachLichHen.Count(l => l.TrangThai == "Chờ xác nhận") : 0)</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl"><i class="fa-solid fa-calendar-check"></i></div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="flex space-x-3 border-b border-slate-200 pb-3">
+            <button id="btn-tab-1" onclick="changeTab('rooms')" class="px-4 py-2 text-sm font-bold rounded-xl bg-royal text-white shadow-sm transition">
+                <i class="fa-solid fa-list mr-1.5"></i> Danh sách phòng trọ
+            </button>
+            <button id="btn-tab-2" onclick="changeTab('appointments')" class="px-4 py-2 text-sm font-semibold rounded-xl text-slate-600 hover:bg-slate-100 transition">
+                <i class="fa-regular fa-calendar-days mr-1.5"></i> Lịch hẹn xem phòng (@(danhSachLichHen != null ? danhSachLichHen.Count : 0))
+            </button>
+        </div>
+
+        <!-- Tab 1: Danh sách phòng -->
+        <div id="tab-rooms" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                        <th class="py-4 px-6">Phòng trọ</th>
+                        <th class="py-4 px-6">Địa chỉ</th>
+                        <th class="py-4 px-6">Giá thuê</th>
+                        <th class="py-4 px-6">Trạng thái phòng</th>
+                        <th class="py-4 px-6">Kiểm duyệt</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var item in Model)
+                    {
+                        var img = item.HinhAnhPhong.FirstOrDefault() != null ? item.HinhAnhPhong.FirstOrDefault().UrlHinhAnh : "https://via.placeholder.com/150";
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="py-4 px-6 flex items-center space-x-3">
+                                <img src="@img" class="w-16 h-14 rounded-xl object-cover border border-slate-200" alt="Ảnh phòng" />
+                                <div>
+                                    <p class="font-bold text-slate-900 line-clamp-1">@item.TieuDe</p>
+                                    <p class="text-xs text-slate-400 mt-0.5">@item.LoaiHinh • @item.DienTich m²</p>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-xs">
+                                <p class="text-slate-800 font-medium">@item.DiaChiChiTiet, @(item.TuyenDuong != null ? item.TuyenDuong.TenDuong : "")</p>
+                                <p class="text-slate-400">@(item.PhuongXa != null ? item.PhuongXa.TenPhuongXa : "")</p>
+                            </td>
+                            <td class="py-4 px-6 font-bold text-rose-600">
+                                @string.Format("{0:N0}", item.GiaThue) đ/tháng
+                            </td>
+                            <td class="py-4 px-6">
+                                <select onchange="updateStatus(@item.PhongID, this.value)" class="text-xs font-semibold rounded-lg px-3 py-1.5 bg-blue-50 text-royal border border-blue-200 focus:outline-none">
+                                    <option value="Còn trống" @(item.TrangThaiPhong == "Còn trống" ? "selected" : "")>Còn trống</option>
+                                    <option value="Đã cho thuê" @(item.TrangThaiPhong == "Đã cho thuê" ? "selected" : "")>Đã cho thuê</option>
+                                </select>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="text-xs px-2.5 py-1 rounded-full @(item.TrangThaiDuyet == "Đã duyệt" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800") font-semibold">
+                                    @item.TrangThaiDuyet
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tab 2: Danh sách lịch hẹn -->
+        <div id="tab-appointments" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-x-auto hidden">
+            <table class="w-full text-left text-sm text-slate-600">
+                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <tr>
+                        <th class="py-4 px-6">Sinh viên</th>
+                        <th class="py-4 px-6">Phòng hẹn xem</th>
+                        <th class="py-4 px-6">Thời gian</th>
+                        <th class="py-4 px-6">Trạng thái</th>
+                        <th class="py-4 px-6 text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @if (danhSachLichHen != null)
+                    {
+                        foreach (var hen in danhSachLichHen)
+                        {
+                            <tr class="hover:bg-slate-50/80 transition">
+                                <td class="py-4 px-6">
+                                    <p class="font-bold text-slate-900">@(hen.NguoiDung != null ? hen.NguoiDung.HoTen : "Sinh viên")</p>
+                                    <p class="text-xs text-slate-400">SĐT: @(hen.NguoiDung != null ? hen.NguoiDung.SoDienThoai : "---")</p>
+                                </td>
+                                <td class="py-4 px-6 text-xs text-slate-800 font-medium">@(hen.PhongTro != null ? hen.PhongTro.TieuDe : "")</td>
+                                <td class="py-4 px-6 text-xs">@hen.ThoiGianHen.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="py-4 px-6"><span class="text-xs px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-semibold">@hen.TrangThai</span></td>
+                                <td class="py-4 px-6 text-center space-x-2">
+                                    @if (hen.TrangThai == "Chờ xác nhận")
+                                    {
+                                        <button onclick="handleAppointment(@hen.LichHenID, 'Đã xác nhận')" class="px-3 py-1 bg-royal text-white rounded-lg text-xs font-bold shadow-sm">Nhận</button>
+                                        <button onclick="handleAppointment(@hen.LichHenID, 'Từ chối')" class="px-3 py-1 bg-rose-50 text-rose-600 rounded-lg text-xs font-bold">Từ chối</button>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-xs text-slate-400 italic">Đã xử lý</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer Đồng Bộ -->
+    <footer class="bg-navy-800 text-white text-center py-6 text-xs mt-12 space-y-1">
+        <p>© 2026 - Website giới thiệu & tìm kiếm phòng trọ</p>
+        <p class="text-slate-400">Phát triển bởi Nhóm 3: Turtles</p>
+    </footer>
+
+    <!-- Modal Đăng tin -->
+    <div id="modalDangTin" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-900 text-lg">Đăng tin phòng trọ mới</h3>
+                <button onclick="document.getElementById('modalDangTin').classList.add('hidden')" class="text-slate-400 text-2xl font-bold">&times;</button>
+            </div>
+            @using (Html.BeginForm("DangTin", "ChuTro", FormMethod.Post, new { @class = "space-y-4 text-sm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div>
+                    <label class="font-semibold block mb-1">Tiêu đề bài đăng *</label>
+                    <input type="text" name="TieuDe" required placeholder="VD: Phòng trọ cao cấp gần ĐH Bình Dương" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="font-semibold block mb-1">Loại hình</label>
+                        <select name="LoaiHinh" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none">
+                            <option value="Phòng trọ khép kín">Phòng trọ khép kín</option>
+                            <option value="Ở ghép">Ở ghép</option>
+                            <option value="Chung cư mini">Chung cư mini</option>
+                            <option value="Ký túc xá">Ký túc xá</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1">Giá thuê (VNĐ) *</label>
+                        <input type="number" name="GiaThue" required class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1">Diện tích (m²) *</label>
+                        <input type="number" name="DienTich" required class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none" />
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="font-semibold block mb-1">Phường / Xã</label>
+                        @Html.DropDownList("PhuongXaID", null, new { @class = "w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none" })
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-1">Tuyến đường</label>
+                        @Html.DropDownList("TuyenDuongID", null, new { @class = "w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none" })
+                    </div>
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1">Địa chỉ chi tiết</label>
+                    <input type="text" name="DiaChiChiTiet" placeholder="VD: Hẻm 123" class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none" />
+                </div>
+                <div>
+                    <label class="font-semibold block mb-1">URL hình ảnh đại diện</label>
+                    <input type="url" name="UrlHinhAnh" placeholder="https://..." class="w-full border border-slate-300 rounded-xl p-2.5 text-sm focus:outline-none" />
+                </div>
+                <div class="flex justify-end space-x-2 pt-4 border-t">
+                    <button type="button" onclick="document.getElementById('modalDangTin').classList.add('hidden')" class="px-4 py-2 border rounded-xl font-semibold text-slate-600">Hủy</button>
+                    <button type="submit" class="px-5 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold shadow">Đăng bài</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <script>
+        function changeTab(t) {
+            document.getElementById('tab-rooms').classList.toggle('hidden', t !== 'rooms');
+            document.getElementById('tab-appointments').classList.toggle('hidden', t === 'rooms');
+            document.getElementById('btn-tab-1').className = t === 'rooms' ? 'px-4 py-2 text-sm font-bold rounded-xl bg-royal text-white shadow-sm' : 'px-4 py-2 text-sm font-semibold rounded-xl text-slate-600 hover:bg-slate-100';
+            document.getElementById('btn-tab-2').className = t === 'appointments' ? 'px-4 py-2 text-sm font-bold rounded-xl bg-royal text-white shadow-sm' : 'px-4 py-2 text-sm font-semibold rounded-xl text-slate-600 hover:bg-slate-100';
+        }
+        function updateStatus(id, st) {
+            fetch('/ChuTro/CapNhatTrangThaiPhong', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${id}&trangThai=${encodeURIComponent(st)}`
+            }).then(r => r.json()).then(d => alert(d.message));
+        }
+        function handleAppointment(id, st) {
+            fetch('/ChuTro/XuLyLichHen', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `lichHenId=${id}&trangThai=${encodeURIComponent(st)}`
+            }).then(r => r.json()).then(d => { alert(d.message); location.reload(); });
+        }
+    </script>
+</body>
+</html>
