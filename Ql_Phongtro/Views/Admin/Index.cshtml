@@ -1,0 +1,148 @@
+﻿@model IEnumerable<Ql_Phongtro.Models.PhongTro>
+
+@{
+    ViewBag.Title = "Quản trị hệ thống";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="margin-top: 20px;">
+    <!-- Header Admin -->
+    <div style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); border-radius: 12px; padding: 30px; color: #333; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <h2 style="font-weight: bold; margin-top: 0;"><i class="glyphicon glyphicon-dashboard"></i> Bảng Điều Khiển Quản Trị</h2>
+        <p style="margin-bottom: 0;">Kiểm duyệt tin đăng và theo dõi tổng quan hệ thống Trọ Cà Mau.</p>
+    </div>
+
+    <!-- Panel Thống kê -->
+    <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-4">
+            <div style="background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 4px solid #3498db;">
+                <h4 class="text-muted">Tổng số tin đăng</h4>
+                <h2 style="color: #3498db; font-weight: bold; margin: 10px 0;">@ViewBag.TongPhong</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 4px solid #f39c12;">
+                <h4 class="text-muted">Tin đang chờ duyệt</h4>
+                <h2 style="color: #f39c12; font-weight: bold; margin: 10px 0;">@ViewBag.PhongChoDuyet</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div style="background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 4px solid #9b59b6;">
+                <h4 class="text-muted">Người dùng hệ thống</h4>
+                <h2 style="color: #9b59b6; font-weight: bold; margin: 10px 0;">@ViewBag.TongNguoiDung</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách bài đăng -->
+    <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+        <h4 style="font-weight: bold; margin-bottom: 20px; color: #2c3e50;"><i class="glyphicon glyphicon-list-alt"></i> Danh sách bài đăng cần xử lý</h4>
+
+        <table class="table table-hover table-striped" style="vertical-align: middle;">
+            <thead>
+                <tr style="background-color: #f8f9fa;">
+                    <th>Mã</th>
+                    <th>Chủ trọ</th>
+                    <th>Tiêu đề phòng</th>
+                    <th>Ngày đăng</th>
+                    <th>Trạng thái</th>
+                    <th class="text-center">Thao tác Admin</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr id="row-admin-@p.PhongID">
+                        <td><strong>#@p.PhongID</strong></td>
+                        <td>@(p.NguoiDung != null ? p.NguoiDung.HoTen : "")<br /><small class="text-muted">@p.NguoiDung.SoDienThoai</small></td>
+                        <td>
+                            <a href="/Home/Details/@p.PhongID" target="_blank" style="font-weight: bold; color: #1a4b82; text-decoration: none;">@p.TieuDe</a>
+                        </td>
+
+                        <!-- ĐÃ SỬA LỖI HIỂN THỊ NGÀY THÁNG BẰNG CÚ PHÁP AN TOÀN -->
+                        <td>@(p.NgayDang.HasValue ? p.NgayDang.Value.ToString("dd/MM/yyyy") : "")</td>
+
+                        <td>
+                            @if (p.TrangThaiDuyet == "Chờ duyệt")
+                            {
+                                <span class="label label-warning" id="badge-@p.PhongID" style="padding: 5px 10px; border-radius: 10px;">Chờ duyệt</span>
+                            }
+                            else if (p.TrangThaiDuyet == "Đã duyệt")
+                            {
+                                <span class="label label-success" id="badge-@p.PhongID" style="padding: 5px 10px; border-radius: 10px;">Đã duyệt</span>
+                            }
+                            else
+                            {
+                                <span class="label label-danger" id="badge-@p.PhongID" style="padding: 5px 10px; border-radius: 10px;">Từ chối</span>
+                            }
+                        </td>
+
+                        <!-- GIAO DIỆN QUYỀN LỰC MỚI CỦA ADMIN -->
+                        <td class="text-center" style="min-width: 150px;">
+                            <select class="form-control input-sm" onchange="xuLyDuyetTin(@p.PhongID, this.value)" style="width: 100px; display: inline-block; font-weight: bold;">
+                                <option value="Chờ duyệt" @(p.TrangThaiDuyet == "Chờ duyệt" ? "selected" : "")>Chờ duyệt</option>
+                                <option value="Đã duyệt" @(p.TrangThaiDuyet == "Đã duyệt" ? "selected" : "")>Đã duyệt</option>
+                                <option value="Từ chối" @(p.TrangThaiDuyet == "Từ chối" ? "selected" : "")>Từ chối</option>
+                            </select>
+
+                            <button class="btn btn-danger btn-sm" onclick="xoaPhongAdmin(@p.PhongID)" title="Xóa vĩnh viễn" style="margin-left: 5px;">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        // JS Đổi trạng thái (Đổi qua đổi lại thoải mái)
+        function xuLyDuyetTin(id, status) {
+            $.ajax({
+                url: '/Admin/DuyetTin',
+                type: 'POST',
+                data: { id: id, trangThai: status },
+                success: function (res) {
+                    if (res.success) {
+                        var badge = $('#badge-' + id);
+                        if (status === 'Đã duyệt') {
+                            badge.removeClass('label-warning label-danger').addClass('label-success').text('Đã duyệt');
+                        } else if (status === 'Từ chối') {
+                            badge.removeClass('label-warning label-success').addClass('label-danger').text('Từ chối');
+                        } else {
+                            badge.removeClass('label-success label-danger').addClass('label-warning').text('Chờ duyệt');
+                        }
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('Lỗi kết nối máy chủ!');
+                }
+            });
+        }
+
+        // JS Xóa phòng dành riêng cho Admin
+        function xoaPhongAdmin(id) {
+            if (!confirm('CẢNH BÁO: Xác nhận XÓA VĨNH VIỄN bài đăng này khỏi hệ thống?')) return;
+
+            $.ajax({
+                url: '/Admin/XoaPhong',
+                type: 'POST',
+                data: { id: id },
+                success: function (res) {
+                    if (res.success) {
+                        $('#row-admin-' + id).fadeOut(400, function () { $(this).remove(); });
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert('Lỗi kết nối máy chủ!');
+                }
+            });
+        }
+    </script>
+}
