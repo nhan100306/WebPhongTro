@@ -274,9 +274,14 @@
             <form action="/ChuTro/DangTin" method="post" enctype="multipart/form-data">
                 @Html.AntiForgeryToken()
 
-                <div class="modal-header" style="background-color: #1a4b82; color: white; border-radius: 9px 9px 0 0;">
-                    <button type="button" class="close" data-dismiss="modal" style="color: white; opacity: 0.9;">&times;</button>
-                    <h4 class="modal-title" style="font-weight: bold;"><i class="glyphicon glyphicon-plus-sign"></i> Đăng tin phòng trọ mới</h4>
+                <div class="modal-header" style="background-color: #123e27; color: white; border-top-left-radius: 4px; border-top-right-radius: 4px;">
+                    <!-- Nút tắt X (Lưu ý: Bạn đã sửa nút X này thành màu trắng ở các bước trước rồi) -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px; top: 15px; z-index: 1050; color: white; opacity: 0.8;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="dangTinModalLabel" style="font-weight: bold; color: white !important;">
+                        Đăng tin phòng trọ mới
+                    </h4>
                 </div>
 
                 <div class="modal-body" style="padding: 25px 30px;">
@@ -381,14 +386,17 @@
                         }
                     </div>
 
-                    <!-- HÌNH ẢNH THỰC TẾ -->
-                    <h5 style="color: #1a4b82; font-weight: bold; border-bottom: 2px solid #eef2f5; padding-bottom: 8px; margin-bottom: 15px; margin-top: 20px;">
-                        5. Hình ảnh thực tế (Tải lên nhiều ảnh)
+                    <!-- 5. Hình ảnh thực tế (Đã sửa cho phép tải nhiều file & video) -->
+                    <h5 style="font-weight: bold; margin-top: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #1a4b82;">
+                        5. Hình ảnh & Video thực tế
                     </h5>
                     <div class="form-group">
-                        <label>Chọn các ảnh về phòng, nhà vệ sinh, lối đi (Giữ Ctrl để chọn nhiều tệp):</label>
-                        <input type="file" name="HinhAnhUpload" multiple class="form-control" accept="image/*" />
-                        <small class="text-muted">Định dạng hỗ trợ: .jpg, .png, .jpeg</small>
+                        <label>Chọn các ảnh/video về phòng (Tối đa 10 tệp):</label>
+                        <!-- THÊM THUỘC TÍNH multiple VÀ accept CẢ VIDEO -->
+                        <input type="file" name="HinhAnhUpload" class="form-control"
+                               accept="image/png, image/jpeg, image/jpg, video/mp4, video/x-m4v, video/*"
+                               multiple onchange="kiemTraSoLuongFile(this)" />
+                        <p class="help-block text-muted" style="font-size: 12px;">Định dạng hỗ trợ: .jpg, .png, .mp4 (Giữ Ctrl để chọn nhiều tệp)</p>
                     </div>
 
                 </div>
@@ -476,6 +484,12 @@
                     alert('Lỗi kết nối máy chủ!');
                 }
             });
+        }
+        function kiemTraSoLuongFile(input) {
+            if (input.files.length > 10) {
+                alert("Bạn chỉ được tải lên tối đa 10 tệp (ảnh/video)!");
+                input.value = ""; // Xóa các file đã chọn
+            }
         }
     </script>
 }

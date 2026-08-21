@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Ql_Phongtro.Models.PhongTro>
+
+@{
+    ViewBag.Title = "Danh sách tất cả phòng trọ - Trọ Cà Mau";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container" style="margin-top: 30px; margin-bottom: 50px;">
+    <!-- Tiêu đề trang -->
+    <h2 style="color: #1a4b82; font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 25px;">
+        <i class="glyphicon glyphicon-list-alt" style="margin-right: 10px;"></i> DANH SÁCH TẤT CẢ PHÒNG TRỌ
+    </h2>
+
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                // Lấy ảnh đầu tiên của phòng trọ làm ảnh đại diện
+                var anhDaiDien = item.HinhAnhPhong.FirstOrDefault();
+                string urlAnh = anhDaiDien != null ? anhDaiDien.UrlHinhAnh : "https://via.placeholder.com/300x200?text=Chưa+có+ảnh";
+
+                <div class="col-md-4 col-sm-6" style="margin-bottom: 25px;">
+                    <!-- Thẻ (Card) hiển thị phòng trọ -->
+                    <div class="thumbnail" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; border: none; transition: 0.3s;">
+
+                        <!-- Hình ảnh -->
+                        <img src="@urlAnh" alt="Ảnh phòng trọ" style="height: 220px; width: 100%; object-fit: cover;" />
+
+                        <!-- Nội dung -->
+                        <div class="caption" style="padding: 15px;">
+                            <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0;" title="@item.TieuDe">
+                                <strong style="color: #333;">@item.TieuDe</strong>
+                            </h4>
+
+                            <!-- Giá tiền nổi bật -->
+                            <h4 class="text-danger" style="font-weight: bold; margin-bottom: 15px;">
+                                @String.Format("{0:0,0}", item.GiaThue) VNĐ/tháng
+                            </h4>
+
+                            <!-- Các thông số cơ bản -->
+                            <p style="color: #666; margin-bottom: 5px;">
+                                <i class="glyphicon glyphicon-home" style="margin-right: 5px;"></i> Diện tích: <strong>@item.DienTich m²</strong>
+                            </p>
+                            <p style="color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <i class="glyphicon glyphicon-map-marker" style="margin-right: 5px;"></i> Khu vực: @(item.PhuongXa != null ? item.PhuongXa.TenPhuongXa : "Đang cập nhật")
+                            </p>
+
+                            <hr style="margin: 15px 0;" />
+
+                            <!-- Nút chức năng -->
+                            <a href="/Home/Details/@item.PhongID" class="btn btn-primary btn-block" style="border-radius: 20px;">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-md-12 text-center">
+                <div class="alert alert-info" style="border-radius: 8px; padding: 20px;">
+                    <i class="glyphicon glyphicon-info-sign" style="font-size: 20px; margin-bottom: 10px;"></i>
+                    <p>Hiện tại chưa có phòng trọ nào trên hệ thống.</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>

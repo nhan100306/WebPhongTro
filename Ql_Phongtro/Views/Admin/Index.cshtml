@@ -1,148 +1,561 @@
-﻿@model IEnumerable<Ql_Phongtro.Models.PhongTro>
-
-@{
-    ViewBag.Title = "Quản trị hệ thống";
+﻿@{
+    ViewBag.Title = "Bảng điều khiển Quản trị";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var dsPhong = ViewBag.DsPhong as List<Ql_Phongtro.Models.PhongTro>;
+    var dsNguoiDung = ViewBag.DsNguoiDung as List<Ql_Phongtro.Models.NguoiDung>;
+    var dsKhuVuc = ViewBag.DsKhuVuc as List<Ql_Phongtro.Models.PhuongXa>;
+    var dsTienIch = ViewBag.DsTienIch as List<Ql_Phongtro.Models.TienIch>;
 }
 
-<div class="container" style="margin-top: 20px;">
-    <!-- Header Admin -->
-    <div style="background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); border-radius: 12px; padding: 30px; color: #333; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-        <h2 style="font-weight: bold; margin-top: 0;"><i class="glyphicon glyphicon-dashboard"></i> Bảng Điều Khiển Quản Trị</h2>
-        <p style="margin-bottom: 0;">Kiểm duyệt tin đăng và theo dõi tổng quan hệ thống Trọ Cà Mau.</p>
-    </div>
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
 
-    <!-- Panel Thống kê -->
-    <div class="row" style="margin-bottom: 30px;">
-        <div class="col-md-4">
-            <div style="background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 4px solid #3498db;">
-                <h4 class="text-muted">Tổng số tin đăng</h4>
-                <h2 style="color: #3498db; font-weight: bold; margin: 10px 0;">@ViewBag.TongPhong</h2>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div style="background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 4px solid #f39c12;">
-                <h4 class="text-muted">Tin đang chờ duyệt</h4>
-                <h2 style="color: #f39c12; font-weight: bold; margin: 10px 0;">@ViewBag.PhongChoDuyet</h2>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div style="background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-bottom: 4px solid #9b59b6;">
-                <h4 class="text-muted">Người dùng hệ thống</h4>
-                <h2 style="color: #9b59b6; font-weight: bold; margin: 10px 0;">@ViewBag.TongNguoiDung</h2>
-            </div>
-        </div>
-    </div>
+    /* Giao diện Header Admin - Đổi sang dải gradient Xanh lá đậm */
+    .admin-header {
+        background: linear-gradient(135deg, #123e27 0%, #3f7b53 100%);
+        border-radius: 12px;
+        padding: 25px 30px;
+        color: #fff;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+    }
 
-    <!-- Bảng danh sách bài đăng -->
-    <div style="background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-        <h4 style="font-weight: bold; margin-bottom: 20px; color: #2c3e50;"><i class="glyphicon glyphicon-list-alt"></i> Danh sách bài đăng cần xử lý</h4>
+    /* Giao diện Thanh Điều hướng Ngang (Tab) */
+    .admin-navbar {
+        background: white;
+        border-radius: 10px;
+        padding: 10px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
 
-        <table class="table table-hover table-striped" style="vertical-align: middle;">
-            <thead>
-                <tr style="background-color: #f8f9fa;">
-                    <th>Mã</th>
-                    <th>Chủ trọ</th>
-                    <th>Tiêu đề phòng</th>
-                    <th>Ngày đăng</th>
-                    <th>Trạng thái</th>
-                    <th class="text-center">Thao tác Admin</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var p in Model)
-                {
-                    <tr id="row-admin-@p.PhongID">
-                        <td><strong>#@p.PhongID</strong></td>
-                        <td>@(p.NguoiDung != null ? p.NguoiDung.HoTen : "")<br /><small class="text-muted">@p.NguoiDung.SoDienThoai</small></td>
-                        <td>
-                            <a href="/Home/Details/@p.PhongID" target="_blank" style="font-weight: bold; color: #1a4b82; text-decoration: none;">@p.TieuDe</a>
-                        </td>
+        .admin-navbar .nav-pills {
+            border-bottom: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
 
-                        <!-- ĐÃ SỬA LỖI HIỂN THỊ NGÀY THÁNG BẰNG CÚ PHÁP AN TOÀN -->
-                        <td>@(p.NgayDang.HasValue ? p.NgayDang.Value.ToString("dd/MM/yyyy") : "")</td>
+            .admin-navbar .nav-pills > li > a {
+                border-radius: 8px;
+                color: #5f6368;
+                font-weight: bold;
+                padding: 12px 25px;
+                font-size: 15px;
+                border: 1px solid transparent;
+                transition: all 0.3s;
+                text-decoration: none !important;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
 
-                        <td>
-                            @if (p.TrangThaiDuyet == "Chờ duyệt")
-                            {
-                                <span class="label label-warning" id="badge-@p.PhongID" style="padding: 5px 10px; border-radius: 10px;">Chờ duyệt</span>
-                            }
-                            else if (p.TrangThaiDuyet == "Đã duyệt")
-                            {
-                                <span class="label label-success" id="badge-@p.PhongID" style="padding: 5px 10px; border-radius: 10px;">Đã duyệt</span>
-                            }
-                            else
-                            {
-                                <span class="label label-danger" id="badge-@p.PhongID" style="padding: 5px 10px; border-radius: 10px;">Từ chối</span>
-                            }
-                        </td>
-
-                        <!-- GIAO DIỆN QUYỀN LỰC MỚI CỦA ADMIN -->
-                        <td class="text-center" style="min-width: 150px;">
-                            <select class="form-control input-sm" onchange="xuLyDuyetTin(@p.PhongID, this.value)" style="width: 100px; display: inline-block; font-weight: bold;">
-                                <option value="Chờ duyệt" @(p.TrangThaiDuyet == "Chờ duyệt" ? "selected" : "")>Chờ duyệt</option>
-                                <option value="Đã duyệt" @(p.TrangThaiDuyet == "Đã duyệt" ? "selected" : "")>Đã duyệt</option>
-                                <option value="Từ chối" @(p.TrangThaiDuyet == "Từ chối" ? "selected" : "")>Từ chối</option>
-                            </select>
-
-                            <button class="btn btn-danger btn-sm" onclick="xoaPhongAdmin(@p.PhongID)" title="Xóa vĩnh viễn" style="margin-left: 5px;">
-                                <i class="glyphicon glyphicon-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+                /* Khi hover chuột - Xanh pastel */
+                .admin-navbar .nav-pills > li > a:hover {
+                    background-color: #e6eedb;
+                    color: #123e27;
                 }
-            </tbody>
-        </table>
-    </div>
-</div>
 
-@section scripts {
-    <script>
-        // JS Đổi trạng thái (Đổi qua đổi lại thoải mái)
-        function xuLyDuyetTin(id, status) {
-            $.ajax({
-                url: '/Admin/DuyetTin',
-                type: 'POST',
-                data: { id: id, trangThai: status },
-                success: function (res) {
-                    if (res.success) {
-                        var badge = $('#badge-' + id);
-                        if (status === 'Đã duyệt') {
-                            badge.removeClass('label-warning label-danger').addClass('label-success').text('Đã duyệt');
-                        } else if (status === 'Từ chối') {
-                            badge.removeClass('label-warning label-success').addClass('label-danger').text('Từ chối');
-                        } else {
-                            badge.removeClass('label-success label-danger').addClass('label-warning').text('Chờ duyệt');
+            /* Khi Tab đang được chọn - Xanh đậm */
+            .admin-navbar .nav-pills > li.active > a,
+            .admin-navbar .nav-pills > li.active > a:hover {
+                background-color: #123e27;
+                color: white;
+                box-shadow: 0 4px 10px rgba(18,62,39,0.3);
+            }
+
+    /* Hiệu ứng bong bóng thông báo */
+    .badge-notify {
+        background-color: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        padding: 4px 8px;
+        font-size: 12px;
+        margin-left: 5px;
+        font-weight: bold;
+    }
+
+    /* Thẻ Thống kê */
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+        transition: transform 0.2s;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+        /* GHI ĐÈ MÀU CÁC THẺ THỐNG KÊ SANG TONE XANH THEO POSTER */
+        .stat-card.blue {
+            border-top: 4px solid #123e27;
+        }
+        /* Xanh cực đậm */
+        .stat-card.yellow {
+            border-top: 4px solid #3f7b53;
+        }
+        /* Xanh nhám */
+        .stat-card.green {
+            border-top: 4px solid #27633e;
+        }
+        /* Xanh lá giữa */
+        .stat-card.purple {
+            border-top: 4px solid #719e71;
+        }
+        /* Xanh nhạt */
+        .stat-card.orange {
+            border-top: 4px solid #8ba891;
+        }
+        /* Xanh pastel đậm */
+        .stat-card.teal {
+            border-top: 4px solid #2ecc71;
+        }
+    /* Xanh lá sáng */
+
+    .content-box {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        min-height: 60vh;
+    }
+</style>
+
+<div class="container" style="margin-top: 20px; margin-bottom: 50px; width: 95%;">
+
+    <!-- HEADER ADMIN -->
+    <div class="admin-header">
+        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 50%; margin-right: 20px;">
+            <!-- Vẫn giữ vương miện màu vàng gold để tạo điểm nhấn quyền lực trên nền xanh -->
+            <i class="glyphicon glyphicon-king" style="font-size: 35px; color: #f1c40f;"></i>
+        </div>
+        <div>
+            <h2 style="font-weight: bold; margin: 0; letter-spacing: 1px; color: white !important;">TRUNG TÂM QUẢN TRỊ HỆ THỐNG</h2>
+            <p style="margin: 5px 0 0 0; font-size: 15px; opacity: 0.9;">Kiểm soát mọi luồng dữ liệu của Trọ Cà Mau.</p>
+        </div>
+    </div>
+
+    <!-- THANH ĐIỀU HƯỚNG NGANG (NAVBAR TABS) -->
+    <div class="admin-navbar">
+        <ul class="nav nav-pills" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#tabDashboard" aria-controls="tabDashboard" role="tab" data-toggle="tab">
+                    <i class="glyphicon glyphicon-signal"></i> Tổng quan
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#tabPhongTro" aria-controls="tabPhongTro" role="tab" data-toggle="tab">
+                    <i class="glyphicon glyphicon-bed"></i> Quản lý Bài đăng
+
+                    <!-- Hiển thị bong bóng đỏ nếu có tin chờ duyệt -->
+                    @if (ViewBag.PhongChoDuyet > 0)
+                    {
+                        <span class="badge-notify" title="Có @ViewBag.PhongChoDuyet tin mới cần duyệt">@ViewBag.PhongChoDuyet</span>
+                    }
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#tabNguoiDung" aria-controls="tabNguoiDung" role="tab" data-toggle="tab">
+                    <i class="glyphicon glyphicon-user"></i> Quản lý Người dùng
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#tabDanhMuc" aria-controls="tabDanhMuc" role="tab" data-toggle="tab">
+                    <i class="glyphicon glyphicon-tags"></i> Cấu hình Danh mục
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- KHU VỰC NỘI DUNG CHÍNH (FULL WIDTH) -->
+    <div class="tab-content content-box">
+
+        <!-- ============================================== -->
+        <!-- MODULE 1: THỐNG KÊ TỔNG QUAN -->
+        <!-- ============================================== -->
+        <div role="tabpanel" class="tab-pane active" id="tabDashboard">
+
+            <h4 class="text-muted" style="margin-bottom: 20px; font-weight: bold; border-left: 4px solid #3498db; padding-left: 10px;">Thống kê Bài Đăng Phòng Trọ</h4>
+            <div class="row" style="margin-bottom: 30px;">
+                <div class="col-md-4"><div class="stat-card blue"><h5 class="text-muted text-uppercase font-weight-bold">Tổng bài đăng</h5><h2 style="color: #3498db; font-weight: bold;">@ViewBag.TongPhong</h2></div></div>
+                <div class="col-md-4"><div class="stat-card yellow"><h5 class="text-muted text-uppercase font-weight-bold">Tin chờ duyệt</h5><h2 style="color: #f39c12; font-weight: bold;">@ViewBag.PhongChoDuyet</h2></div></div>
+                <div class="col-md-4"><div class="stat-card green"><h5 class="text-muted text-uppercase font-weight-bold">Phòng còn trống</h5><h2 style="color: #2ecc71; font-weight: bold;">@ViewBag.PhongConTrong</h2></div></div>
+            </div>
+
+            <h4 class="text-muted" style="margin-bottom: 20px; font-weight: bold; border-left: 4px solid #9b59b6; padding-left: 10px;">Thống kê Tài Khoản & Người Dùng</h4>
+            <div class="row">
+                <div class="col-md-4"><div class="stat-card purple"><h5 class="text-muted text-uppercase font-weight-bold">Tổng tài khoản</h5><h2 style="color: #9b59b6; font-weight: bold;">@ViewBag.TongNguoiDung</h2></div></div>
+                <div class="col-md-4"><div class="stat-card orange"><h5 class="text-muted text-uppercase font-weight-bold">Tài khoản Chủ trọ</h5><h2 style="color: #e67e22; font-weight: bold;">@ViewBag.TongChuTro</h2></div></div>
+                <div class="col-md-4"><div class="stat-card teal"><h5 class="text-muted text-uppercase font-weight-bold">Tài khoản Sinh viên</h5><h2 style="color: #1abc9c; font-weight: bold;">@ViewBag.TongSinhVien</h2></div></div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MODULE 2: QUẢN LÝ PHÒNG TRỌ -->
+        <!-- ============================================== -->
+        <div role="tabpanel" class="tab-pane" id="tabPhongTro">
+
+            <div class="row" style="margin-bottom: 20px;">
+                <div class="col-md-6">
+                    <h4 class="text-muted" style="margin: 0; font-weight: bold; border-left: 4px solid #1a4b82; padding-left: 10px; line-height: 34px;">Danh sách tất cả bài đăng</h4>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-addon" style="background-color: #fff;"><i class="glyphicon glyphicon-search text-muted"></i></span>
+                        <input type="text" id="inputSearchPhong" class="form-control" placeholder="Nhập tên phòng, tên chủ trọ hoặc SĐT để tìm nhanh...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped" id="tablePhongTro" style="vertical-align: middle;">
+                    <thead>
+                        <tr style="background-color: #f1f3f4;">
+                            <th>Mã</th>
+                            <th>Chủ trọ</th>
+                            <th>Tiêu đề phòng</th>
+                            <th>Ngày đăng</th>
+                            <th>Trạng thái</th>
+                            <th class="text-center">Thao tác Kiểm duyệt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (dsPhong != null)
+                        {
+                            foreach (var p in dsPhong)
+                            {
+                                <tr id="row-admin-@p.PhongID">
+                                    <td><strong>#@p.PhongID</strong></td>
+                                    <td>@(p.NguoiDung != null ? p.NguoiDung.HoTen : "")<br /><small class="text-muted">@p.NguoiDung.SoDienThoai</small></td>
+                                    <td><a href="/Home/Details/@p.PhongID" target="_blank" style="font-weight: bold; color: #1a4b82; text-decoration: none;">@p.TieuDe</a></td>
+                                    <td>@(p.NgayDang.HasValue ? p.NgayDang.Value.ToString("dd/MM/yyyy") : "")</td>
+                                    <td>
+                                        @if (p.TrangThaiDuyet == "Chờ duyệt")
+                                        {<span class="label label-warning" id="badge-@p.PhongID">Chờ duyệt</span> }
+                                        else if (p.TrangThaiDuyet == "Đã duyệt")
+                                        { <span class="label label-success" id="badge-@p.PhongID">Đã duyệt</span> }
+                                        else
+                                        { <span class="label label-danger" id="badge-@p.PhongID">Từ chối</span>}
+                                    </td>
+                                    <td class="text-center">
+                                        <select class="form-control input-sm" onchange="xuLyDuyetTin(@p.PhongID, this.value)" style="width: 120px; display: inline-block; font-size: 13px; font-weight: bold;">
+                                            <option value="Chờ duyệt" @(p.TrangThaiDuyet == "Chờ duyệt" ? "selected" : "")>Chờ duyệt</option>
+                                            <option value="Đã duyệt" @(p.TrangThaiDuyet == "Đã duyệt" ? "selected" : "")>Đã duyệt</option>
+                                            <option value="Vi phạm" @(p.TrangThaiDuyet == "Vi phạm" ? "selected" : "")>Từ chối</option>
+                                        </select>
+                                        <button class="btn btn-danger btn-sm" onclick="xoaPhongAdmin(@p.PhongID)" style="margin-left: 5px;"><i class="glyphicon glyphicon-trash"></i></button>
+                                    </td>
+                                </tr>
+                            }
                         }
-                    } else {
-                        alert(res.message);
-                    }
-                },
-                error: function () {
-                    alert('Lỗi kết nối máy chủ!');
-                }
-            });
-        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-        // JS Xóa phòng dành riêng cho Admin
-        function xoaPhongAdmin(id) {
-            if (!confirm('CẢNH BÁO: Xác nhận XÓA VĨNH VIỄN bài đăng này khỏi hệ thống?')) return;
+        <!-- ============================================== -->
+        <!-- MODULE 3: QUẢN LÝ NGƯỜI DÙNG -->
+        <!-- ============================================== -->
+        <div role="tabpanel" class="tab-pane" id="tabNguoiDung">
 
-            $.ajax({
-                url: '/Admin/XoaPhong',
-                type: 'POST',
-                data: { id: id },
-                success: function (res) {
-                    if (res.success) {
-                        $('#row-admin-' + id).fadeOut(400, function () { $(this).remove(); });
-                    } else {
-                        alert(res.message);
-                    }
-                },
-                error: function () {
-                    alert('Lỗi kết nối máy chủ!');
+            <div class="row" style="margin-bottom: 20px;">
+                <div class="col-md-6">
+                    <h4 class="text-muted" style="margin: 0; font-weight: bold; border-left: 4px solid #1a4b82; padding-left: 10px; line-height: 34px;">Danh sách người dùng hệ thống</h4>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-addon" style="background-color: #fff;"><i class="glyphicon glyphicon-search text-muted"></i></span>
+                        <input type="text" id="inputSearchUser" class="form-control" placeholder="Nhập họ tên, SĐT hoặc vai trò để tìm kiếm...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover table-bordered" id="tableNguoiDung">
+                    <thead>
+                        <tr style="background-color: #f1f3f4;">
+                            <th class="text-center">ID</th>
+                            <th>Họ và Tên</th>
+                            <th>Số điện thoại</th>
+                            <th>Vai trò</th>
+                            <th>Ngày tham gia</th>
+                            <th>Trạng thái</th>
+                            <th class="text-center">Tác vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (dsNguoiDung != null)
+                        {
+                            foreach (var u in dsNguoiDung)
+                            {
+                                <tr>
+                                    <td class="text-center text-muted">@u.UserID</td>
+                                    <td><strong>@u.HoTen</strong></td>
+                                    <td>@u.SoDienThoai</td>
+                                    <td>
+                                        @if (u.VaiTro == "Admin")
+                                        {<span class="label label-danger">Quản trị viên</span> }
+                                        else if (u.VaiTro == "ChuTro")
+                                        { <span class="label label-warning">Chủ nhà trọ</span> }
+                                        else
+                                        { <span class="label label-info">Sinh viên tìm phòng</span>}
+                                    </td>
+                                    <td>@(u.NgayTao.HasValue ? u.NgayTao.Value.ToString("dd/MM/yyyy") : "")</td>
+                                    <td>
+                                        <span class="label @(u.TrangThai == "Hoạt động" ? "label-success" : "label-danger")" id="status-user-@u.UserID">@u.TrangThai</span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (u.VaiTro != "Admin")
+                                        {
+                                            <button class="btn @(u.TrangThai == "Hoạt động" ? "btn-warning" : "btn-success") btn-xs" id="btn-user-@u.UserID" onclick="thayDoiTrangThaiUser(@u.UserID)">
+                                                <i class="glyphicon @(u.TrangThai == "Hoạt động" ? "glyphicon-lock" : "glyphicon-ok")"></i>
+                                                <span class="btn-text">@(u.TrangThai == "Hoạt động" ? "Khóa" : "Mở khóa")</span>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- MODULE 4: QUẢN LÝ DANH MỤC -->
+        <!-- ============================================== -->
+        <div role="tabpanel" class="tab-pane" id="tabDanhMuc">
+            <h4 class="text-muted" style="margin-bottom: 20px; font-weight: bold; border-left: 4px solid #1a4b82; padding-left: 10px;">Quản lý dữ liệu hệ thống</h4>
+
+            <div class="row">
+                <!-- Khu vực -->
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="background-color: #f1f3f4; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="glyphicon glyphicon-map-marker text-danger"></i> Danh mục Khu vực</span>
+                            <button class="btn btn-primary btn-xs" onclick="themKhuVuc()">Thêm mới</button>
+                        </div>
+                        <ul class="list-group" style="max-height: 400px; overflow-y: auto;">
+                            @if (dsKhuVuc != null)
+                            {
+                                foreach (var kv in dsKhuVuc)
+                                {
+                                    <li class="list-group-item" id="row-kv-@kv.PhuongXaID" style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span id="ten-kv-@kv.PhuongXaID">@kv.TenPhuongXa</span>
+                                        <div class="pull-right">
+                                            <button class="btn btn-warning btn-xs" onclick="suaKhuVuc(@kv.PhuongXaID, '@kv.TenPhuongXa')" style="margin-right: 5px;"><i class="glyphicon glyphicon-pencil"></i> Sửa</button>
+                                            <button class="btn btn-danger btn-xs" onclick="xoaKhuVuc(@kv.PhuongXaID)"><i class="glyphicon glyphicon-trash"></i> Xóa</button>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tiện ích -->
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" style="background-color: #f1f3f4; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="glyphicon glyphicon-flash text-warning"></i> Danh mục Tiện ích</span>
+                            <button class="btn btn-primary btn-xs" onclick="themTienIch()">Thêm mới</button>
+                        </div>
+                        <ul class="list-group" style="max-height: 400px; overflow-y: auto;">
+                            @if (dsTienIch != null)
+                            {
+                                foreach (var ti in dsTienIch)
+                                {
+                                    <li class="list-group-item" id="row-ti-@ti.TienIchID" style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span id="ten-ti-@ti.TienIchID">@ti.TenTienIch</span>
+                                        <div class="pull-right">
+                                            <button class="btn btn-warning btn-xs" onclick="suaTienIch(@ti.TienIchID, '@ti.TenTienIch')" style="margin-right: 5px;"><i class="glyphicon glyphicon-pencil"></i> Sửa</button>
+                                            <button class="btn btn-danger btn-xs" onclick="xoaTienIch(@ti.TienIchID)"><i class="glyphicon glyphicon-trash"></i> Xóa</button>
+                                        </div>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div> 
+    </div>
+        <!-- KỊCH BẢN XỬ LÝ AJAX -->
+        @section scripts {
+            <script>
+                $(document).ready(function () {
+                    $('.admin-navbar a[data-toggle="tab"]').on('click', function (e) {
+                        e.preventDefault();
+                        $('.admin-navbar li').removeClass('active');
+                        $(this).parent().addClass('active');
+
+                        var target = $(this).attr('href');
+                        $('.tab-pane').removeClass('active');
+                        $(target).addClass('active');
+                    });
+                });
+                $(document).ready(function () {
+                    // Thuật toán lọc cho bảng Bài đăng
+                    $("#inputSearchPhong").on("keyup", function () {
+                        var value = $(this).val().toLowerCase();
+                        $("#tablePhongTro tbody tr").filter(function () {
+                            // Ẩn/hiện dòng (tr) nếu chữ trong dòng đó có chứa từ khóa
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                        });
+                    });
+
+                    // Thuật toán lọc cho bảng Người dùng
+                    $("#inputSearchUser").on("keyup", function () {
+                        var value = $(this).val().toLowerCase();
+                        $("#tableNguoiDung tbody tr").filter(function () {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                        });
+                    });
+                });
+                // 1. Script Duyệt & Xóa Phòng (Giữ nguyên)
+                function xuLyDuyetTin(id, status) {
+                    $.ajax({
+                        url: '/Admin/DuyetTin', type: 'POST', data: { id: id, trangThai: status }, success: function (res) {
+                            if (res.success) {
+                                var badge = $('#badge-' + id);
+                                if (status === 'Đã duyệt') { badge.removeClass('label-warning label-danger').addClass('label-success').text('Đã duyệt'); }
+                                else if (status === 'Vi phạm') { badge.removeClass('label-warning label-success').addClass('label-danger').text('Từ chối'); }
+                                else { badge.removeClass('label-success label-danger').addClass('label-warning').text('Chờ duyệt'); }
+                            } else { alert(res.message); }
+                        }
+                    });
                 }
-            });
+
+                function xoaPhongAdmin(id) {
+                    if (!confirm('Xác nhận XÓA VĨNH VIỄN bài đăng này khỏi hệ thống?')) return;
+                    $.ajax({
+                        url: '/Admin/XoaPhong', type: 'POST', data: { id: id }, success: function (res) {
+                            if (res.success) { $('#row-admin-' + id).fadeOut(400, function () { $(this).remove(); }); } else { alert(res.message); }
+                        }
+                    });
+                }
+
+                // 2. Script Quản Lý Người Dùng
+                function thayDoiTrangThaiUser(id) {
+                    if (!confirm("Xác nhận thay đổi trạng thái của tài khoản này?")) return;
+                    $.ajax({
+                        url: '/Admin/ThayDoiTrangThaiTaiKhoan', type: 'POST', data: { id: id },
+                        success: function (res) {
+                            if (res.success) {
+                                var badge = $('#status-user-' + id);
+                                var btn = $('#btn-user-' + id);
+
+                                if (res.newState === 'Hoạt động') {
+                                    badge.removeClass('label-danger').addClass('label-success').text('Hoạt động');
+                                    btn.removeClass('btn-success').addClass('btn-warning');
+                                    btn.html('<i class="glyphicon glyphicon-lock"></i> <span class="btn-text">Khóa</span>');
+                                } else {
+                                    badge.removeClass('label-success').addClass('label-danger').text('Bị khóa');
+                                    btn.removeClass('btn-warning').addClass('btn-success');
+                                    btn.html('<i class="glyphicon glyphicon-ok"></i> <span class="btn-text">Mở khóa</span>');
+                                }
+                            } else { alert(res.message); }
+                        }
+                    });
+                }
+
+                // 3. Script Quản Lý Danh Mục
+                function themKhuVuc() {
+                    var ten = prompt("Nhập tên khu vực (Phường/Xã) mới:");
+                    if (ten) {
+                        $.ajax({
+                            url: '/Admin/ThemKhuVuc', type: 'POST', data: { tenKhuVuc: ten }, success: function (res) {
+                                if (res.success) location.reload(); else alert(res.message);
+                            }
+                        });
+                    }
+                }
+
+                function xoaKhuVuc(id) {
+                    if (!confirm("Xác nhận xóa khu vực này?")) return;
+                    $.ajax({
+                        url: '/Admin/XoaKhuVuc', type: 'POST', data: { id: id }, success: function (res) {
+                            if (res.success) $('#row-kv-' + id).remove(); else alert(res.message || "Lỗi xóa!");
+                        }
+                    });
+                }
+                function suaKhuVuc(id, tenCu) {
+                    // Mở hộp thoại nhập liệu
+                    var tenMoi = prompt("Nhập tên Khu vực (Phường/Xã) mới:", tenCu);
+
+                    // Kiểm tra: Nếu người dùng có nhập và tên mới khác tên cũ
+                    if (tenMoi != null && tenMoi.trim() !== "" && tenMoi !== tenCu) {
+                        $.ajax({
+                            url: '/Admin/SuaKhuVuc',
+                            type: 'POST',
+                            data: { id: id, tenKhuVuc: tenMoi },
+                            success: function (res) {
+                                if (res.success) {
+                                    location.reload(); // Ép load lại trang để hiển thị tên mới từ SQL
+                                } else {
+                                    alert(res.message || "Sửa thất bại!");
+                                }
+                            },
+                            error: function () {
+                                alert("Lỗi kết nối máy chủ!");
+                            }
+                        });
+                    }
+                }
+                function themTienIch() {
+                    var ten = prompt("Nhập tên tiện ích mới:");
+                    if (ten) {
+                        $.ajax({
+                            url: '/Admin/ThemTienIch', type: 'POST', data: { tenTienIch: ten }, success: function (res) {
+                                if (res.success) location.reload();
+                            }
+                        });
+                    }
+                }
+
+                function xoaTienIch(id) {
+                    if (!confirm("Xác nhận xóa tiện ích này?")) return;
+                    $.ajax({
+                        url: '/Admin/XoaTienIch', type: 'POST', data: { id: id }, success: function (res) {
+                            if (res.success) location.reload(); // Reload để đồng bộ giao diện
+                        }
+                    });
+                }
+                function suaTienIch(id, tenCu) {
+                    // Mở hộp thoại nhập liệu
+                    var tenMoi = prompt("Nhập tên Tiện ích mới:", tenCu);
+
+                    // Kiểm tra: Nếu người dùng có nhập và tên mới khác tên cũ
+                    if (tenMoi != null && tenMoi.trim() !== "" && tenMoi !== tenCu) {
+                        $.ajax({
+                            url: '/Admin/SuaTienIch',
+                            type: 'POST',
+                            data: { id: id, tenTienIch: tenMoi },
+                            success: function (res) {
+                                if (res.success) {
+                                    location.reload(); // Ép load lại trang để hiển thị tên mới từ SQL
+                                } else {
+                                    alert(res.message || "Sửa thất bại!");
+                                }
+                            },
+                            error: function () {
+                                alert("Lỗi kết nối máy chủ!");
+                            }
+                        });
+                    }
+                }
+            </script>
         }
-    </script>
-}

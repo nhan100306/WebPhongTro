@@ -15,14 +15,38 @@
             padding-top: 80px;
         }
 
-        /* Code Thanh Menu tự thiết kế (Bất chấp lỗi Bootstrap) */
+        /* ĐỒNG BỘ MÀU XANH THEO POSTER CHO TOÀN TRANG (Bootstrap Overrides) */
+        h1, h2, h3, h4, h5, h6 {
+            color: #123e27 !important;
+        }
+
+        .page-header {
+            border-bottom: 2px solid #8ba891 !important;
+        }
+
+        hr {
+            border-top: 1px solid #8ba891 !important;
+        }
+
+        .btn-primary {
+            background-color: #27633e !important;
+            border-color: #1d4a2e !important;
+            color: white !important;
+        }
+
+            .btn-primary:hover, .btn-primary:focus {
+                background-color: #1d4a2e !important;
+                border-color: #112e1c !important;
+            }
+
+        /* Code Thanh Menu tự thiết kế */
         .my-navbar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             height: 65px;
-            background-color: #1a4b82;
+            background-color: #123e27; /* Xanh lá cực đậm */
             color: white;
             display: flex;
             justify-content: space-between;
@@ -33,7 +57,7 @@
         }
 
             .my-navbar a {
-                color: white;
+                color: #d4e3d5; /* Xanh nhạt pastel */
                 text-decoration: none;
                 font-size: 15px;
                 margin: 0 15px;
@@ -42,7 +66,7 @@
             }
 
                 .my-navbar a:hover {
-                    color: #f1c40f;
+                    color: #ffffff; /* Sáng lên khi hover */
                 }
 
         .nav-left, .nav-right {
@@ -50,9 +74,9 @@
             align-items: center;
         }
 
-        /* Tùy chỉnh nút */
+        /* Tùy chỉnh nút Đăng ký ngay */
         .btn-register {
-            background-color: #f39c12;
+            background-color: #3f7b53; /* Xanh lá nhám */
             padding: 8px 20px;
             border-radius: 25px;
             color: #fff !important;
@@ -60,7 +84,7 @@
         }
 
             .btn-register:hover {
-                background-color: #e67e22;
+                background-color: #27633e;
             }
 
         /* Box User khi đăng nhập */
@@ -89,8 +113,8 @@
             }
 
         .footer {
-            background-color: #2c3e50;
-            color: white;
+            background-color: #0b2919; /* Xanh đen */
+            color: #e6eedb;
             padding: 25px 0;
             margin-top: 50px;
             text-align: center;
@@ -102,11 +126,11 @@
     <!-- THANH ĐIỀU HƯỚNG MỚI -->
     <div class="my-navbar">
         <div class="nav-left">
-            <a href="/Home/Index" style="font-size: 20px; font-weight: bold; margin-right: 40px; letter-spacing: 1px;">
+            <a href="/Home/Index" style="font-size: 20px; font-weight: bold; margin-right: 40px; letter-spacing: 1px; color: white;">
                 <i class="glyphicon glyphicon-home"></i> TRỌ CÀ MAU
             </a>
             <a href="/Home/Index">Trang chủ</a>
-            <a href="#">Danh sách phòng</a>
+            <a href="@Url.Action("DanhSachPhong", "Home")">Danh sách phòng</a>
         </div>
 
         <div class="nav-right">
@@ -114,7 +138,7 @@
             {
                 <!-- NẾU ĐÃ ĐĂNG NHẬP SẼ HIỆN KHỐI NÀY -->
                 <div class="user-box">
-                    <span>Xin chào, <strong>@Session["HoTen"]</strong></span>
+                    <span>Xin chào, <strong style="color: white;">@Session["HoTen"]</strong></span>
 
                     <!-- Chuyển hướng theo chức vụ -->
                     @if (Session["VaiTro"] != null && Session["VaiTro"].ToString() == "Admin")

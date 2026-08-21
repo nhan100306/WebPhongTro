@@ -86,5 +86,15 @@ namespace Ql_Phongtro.Controllers
             TempData["LichHenSuccess"] = "Gửi yêu cầu đặt lịch hẹn thành công! Chủ trọ sẽ sớm xem và phản hồi bạn.";
             return RedirectToAction("Details", new { id = PhongID });
         }
+        public ActionResult DanhSachPhong()
+        {
+            // Lấy các phòng đã duyệt và còn trống, sắp xếp phòng mới nhất lên đầu
+            var danhSach = db.PhongTro
+                             .Where(p => p.TrangThaiDuyet == "Đã duyệt" && p.TrangThaiPhong == "Còn trống")
+                             .OrderByDescending(p => p.NgayDang)
+                             .ToList();
+
+            return View(danhSach);
+        }
     }
 }
